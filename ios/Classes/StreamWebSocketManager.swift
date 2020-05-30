@@ -31,6 +31,7 @@ class StreamWebSocketManager: NSObject, WebSocketDelegate {
     func areUpdateEnabled() -> Bool { return updatesEnabled }
 
     func create(url: String, header: [String: String]?, enableCompression _: Bool?, disableSSL _: Bool?, enableRetries: Bool) {
+        print("34 StreamWebSocketManager: create() executed!")
         var request = URLRequest(url: URL(string: url)!)
         if header != nil {
             for key in header!.keys {
@@ -38,7 +39,7 @@ class StreamWebSocketManager: NSObject, WebSocketDelegate {
             }
         }
         self.enableRetries = enableRetries
-        print(request.allHTTPHeaderFields as Any)
+        print("42 request.allHTTPHeaderFields es: \(request.allHTTPHeaderFields as Any)")
         ws = WebSocket(request: request)
         ws?.delegate = self
 //        if(enableCompression != nil) {
@@ -56,8 +57,9 @@ class StreamWebSocketManager: NSObject, WebSocketDelegate {
     }
 
     func onConnect() {
+        print("60 StreamWebSocketManager: onConnect() executed!")
         ws?.onConnect = {
-            // print("opened")
+             print("62 StreamWebSocketManager:ws?.onConnect opened")
             if self.conectedCallback != nil {
                 (self.conectedCallback!)(true)
             }
@@ -65,20 +67,24 @@ class StreamWebSocketManager: NSObject, WebSocketDelegate {
     }
 
     func connect() {
+        print("70 StreamWebSocketManager: connect() executed!")
         onText()
         ws?.connect()
     }
 
     func disconnect() {
+        print("76 StreamWebSocketManager: disconnect() executed!")
         enableRetries = false
         ws?.disconnect()
     }
 
     func send(string: String) {
+        print("76 StreamWebSocketManager: disconnect() executed!")
         ws?.write(string: string)
     }
 
     func onText() {
+        print("76 StreamWebSocketManager: disconnect() executed!")
         ws?.onText = { (text: String) in
             // print("recv: \(text)")
             if self.messageCallback != nil {
@@ -88,27 +94,33 @@ class StreamWebSocketManager: NSObject, WebSocketDelegate {
     }
 
     func onClose() {
+        print("97 StreamWebSocketManager: onClose() executed! attached listener :)")
         ws?.onDisconnect = { (error: Error?) in
-             print("close \(String(describing: error).debugDescription)")
+             print("99 close \(String(describing: error).debugDescription)")
+             print("100 ws?.onDisconnect self.enableRetries es: \(self.enableRetries)");
             if self.enableRetries {
+                print("102 StreamWebSocketManager: enableRetries() enter!")
                 self.connect()
             } else {
+                print("105 StreamWebSocketManager: self.conectedCallback != nil es: \(self.conectedCallback != nil)")
                 if self.conectedCallback != nil {
+                    print("107 StreamWebSocketManager: (self.conectedCallback!)(false) executed!")
                     (self.conectedCallback!)(false)
                 }
+                print("110 StreamWebSocketManager: self.closeCallback != nil es: \(self.closeCallback != nil)")
                 if self.closeCallback != nil {
                     if error != nil {
                         if error is WSError {
-                            // print("Error message: \((error as! WSError).message)")
+                             print("Error message: \((error as! WSError).message)")
                         }
                         (self.closeCallback!)("false")
-                        print("close callback calling false")
+                        print("117 close callback calling false")
                     } else {
                         (self.closeCallback!)("true")
-                        print("close callback calling true")
+                        print("120 close callback calling true")
                     }
                 } else {
-                    print("close callback is nil")
+                    print("124 close callback is nil")
                 }
             }
         }
@@ -123,6 +135,7 @@ class StreamWebSocketManager: NSObject, WebSocketDelegate {
     }
 
     func echoTest() {
+        print("105 StreamWebSocketManager: echoTest() executed!")
         var messageNum = 0
         ws = WebSocket(url: URL(string: "wss://echo.websocket.org")!)
         ws?.delegate = self

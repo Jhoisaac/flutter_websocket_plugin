@@ -36,6 +36,7 @@ public class SwiftWebsocketManagerPlugin: NSObject, FlutterPlugin {
 
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         if call.method == "create" {
+            print("39 SwiftWebsocketManagerPlugin: create method executed!")
             let arguments = call.arguments as! [String: Any]
             let url = arguments["url"] as! String
             // print(url)
@@ -81,6 +82,7 @@ public class SwiftWebsocketManagerPlugin: NSObject, FlutterPlugin {
             // print("listening")
             result("")
         } else if call.method == "onDone" {
+            print("85 SwiftWebsocketManagerPlugin: onDone method executed!")
             streamWebSocketManager.closeCallback = closeHandler
             streamWebSocketManager.onClose()
             result("")
@@ -92,7 +94,7 @@ public class SwiftWebsocketManagerPlugin: NSObject, FlutterPlugin {
     }
 
     func closeHandler(msg: String) {
-        // print("closed \(msg)")
+         print("97 SwiftWebsocketManagerPlugin: closeHandler() \(msg)")
         closeStreamHandler.send(data: msg)
     }
 }
